@@ -1,0 +1,83 @@
+{
+  "status": "PASS",
+  "started_at_utc": "2026-10-21T14:20:46.461981+00:00",
+  "python": "3.12.14 (main, Aug 25 2026, 14:00:49) [Clang 22.1.3 ]",
+  "platform": "Linux-6.18.55-x86_64-with-glibc2.39",
+  "optional_dependencies": {
+    "numpy": "2.3.5",
+    "scipy": "1.17.0"
+  },
+  "solver_requested": true,
+  "source_sha256": {
+    "code/check_proper.py": "03f01da3c2835002a7f3613b9647a70daf16401d86cfbbd363fc6391e16d151a",
+    "code/majority_6040.py": "35f023a179133394d360a234caf66fba3ab26255075b4cc645e7fdd12f4934c4",
+    "code/majority_active.py": "439eea006844c79f72ee0d0036fddf324302f1dc8705bc2355607311a50ee17c",
+    "code/pac_thresholds.py": "d3bd04795a7dcc8f9528c3462d6f05c193fb9c2eb239574a52ff290a502df08b",
+    "code/proper_signed_majority.py": "7ad7b46922fbbb7d4734bce381962803fd5a23bf78146b7c40fc49e915dbbfc7",
+    "code/verify_6040.py": "52eb064a684762d8ef7f622f833dda45c4634814113727050d3501fd66df2332",
+    "code/verify_active.py": "e23d7a3903c27841b5fc4007be83f7d2246252fc39b9d98bb68cd3b4d8da154e",
+    "code/verify_reduction.py": "9b65f64a3379dfd6a2fb3a7d432e5745fe998fd71e6f38246b91b97fea58e30f",
+    "code/verify_thresholds.py": "175cce399ef8a5b22badf1dae6b8b8705e72b563368c18a7b17edcaf5e8bd234",
+    "paper/majority_6040_note.tex": "2f51e8cb24510a5c48dce216b343f514b9152a7bd9019489858cce564219bb68",
+    "audit/independent_checks.py": "4960043e2d6d36e359da19d386a63a2110f1c2a9ceca54479cbe94c12df65fc6",
+    "run_all_checks.py": "1e05698eda0d67298ba728b8f88d1ef5dae98554ba366d7b30bb6dded31e0e2a"
+  },
+  "scope": "Finite checks and regression tests; not a formal proof or an external review.",
+  "suites": [
+    {
+      "name": "group",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "PASS",
+      "seconds": 1.122,
+      "result_file": "verification_results.json",
+      "result_sha256": "d2cedf7ab580e149102270539a0d6b70a03592d7ef7e1c5c8ec76a9c9d41fe02"
+    },
+    {
+      "name": "active",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "PASS",
+      "seconds": 0.659,
+      "result_file": "active_verification_results.json",
+      "result_sha256": "e2b2b2d5d145df67b0f7006e59e681b18a6346def808178b8e747042d3858613"
+    },
+    {
+      "name": "signed_literal",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "all finite checks passed",
+      "seconds": 0.798,
+      "result_file": "proper_verification_results.json",
+      "result_sha256": "42ad7cd34a979b643e44b381e656cedbfa16e529b2ceed93e3c84ed7f247d54d"
+    },
+    {
+      "name": "thresholds",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "PASS",
+      "seconds": 0.098,
+      "result_file": "threshold_verification_results.json",
+      "result_sha256": "5712b4c3e08006221d035a4cdd778dee90230a78eb13230a3da0eeabcda315f3"
+    },
+    {
+      "name": "compatibility",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "PASS",
+      "seconds": 2.803,
+      "result_file": "compatibility_verification_results.json",
+      "result_sha256": "82bb80385d1c4bed2eaa520550f27a8a53920dd303fa66ac1faba3b551ad0795"
+    },
+    {
+      "name": "independent_audit",
+      "status": "PASS",
+      "returncode": 0,
+      "reported_status": "PASS",
+      "seconds": 3.611,
+      "result_file": "independent_audit_results.json",
+      "result_sha256": "0987a54ecb6da64bb4097beeeb5850cc135693f2b7ce387b6aa303dc79ed1937"
+    }
+  ],
+  "finished_at_utc": "2026-10-21T14:20:55.567637+00:00"
+}

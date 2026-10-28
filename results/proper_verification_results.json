@@ -1,0 +1,100 @@
+{
+  "status": "all finite checks passed",
+  "margin_implication": {
+    "all_sign_vector_point_pairs": 87380,
+    "compatible_pairs": 28348
+  },
+  "enumeration_branch": {
+    "fully_checked_target_distributions": 126,
+    "total_support_observations": 1872
+  },
+  "integer_and_rounding_details": {
+    "rounded_coefficient_values": 33,
+    "five_bit_inputs_each": 32,
+    "exact_example_epsilon": "1/10",
+    "exact_example_delta": "1/100",
+    "q": 8,
+    "r": 17,
+    "m": 131072
+  },
+  "large_dimension_branch": [
+    {
+      "n": 2560,
+      "m": 16,
+      "positive_group_size": 1,
+      "corrections": 31,
+      "rounding_trials": 1,
+      "smallest_signed_training_score": 350
+    },
+    {
+      "n": 2560,
+      "m": 16,
+      "positive_group_size": 640,
+      "corrections": 29,
+      "rounding_trials": 1,
+      "smallest_signed_training_score": 302
+    },
+    {
+      "n": 2560,
+      "m": 16,
+      "positive_group_size": 1280,
+      "corrections": 30,
+      "rounding_trials": 1,
+      "smallest_signed_training_score": 348
+    },
+    {
+      "n": 2560,
+      "m": 16,
+      "positive_group_size": 2559,
+      "corrections": 32,
+      "rounding_trials": 1,
+      "smallest_signed_training_score": 322
+    }
+  ],
+  "full_constructor_randomness_before_sample": {
+    "random_calls": 2,
+    "random_bits": 10,
+    "observations": 16384
+  },
+  "prediction_does_not_imply_compatibility": {
+    "n": 10,
+    "x": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "target_signs": [
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      1,
+      1,
+      -1,
+      -1,
+      -1
+    ],
+    "candidate_signs": [
+      1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1,
+      -1
+    ],
+    "candidate_centered_score": 2,
+    "candidate_group_compatibility": false
+  }
+}

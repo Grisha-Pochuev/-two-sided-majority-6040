@@ -1,0 +1,1222 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=25mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern,amsmath,amssymb,amsthm,enumitem,microtype}
+\usepackage[colorlinks=true,urlcolor=blue,citecolor=blue,linkcolor=blue]{hyperref}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\lhead{Two-sided 60/40 majority}
+\rhead{21 October 2026}
+\cfoot{\thepage}
+\setlength{\headheight}{14pt}
+\setlength{\parskip}{3pt}
+\setlength{\emergencystretch}{2em}
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newcommand{\sgnplus}{\operatorname{sgn}_{+}}
+\newcommand{\err}{\operatorname{err}}
+\newcommand{\unl}{\operatorname{unl}}
+\newcommand{\norm}[1]{\left\lVert#1\right\rVert}
+\newcommand{\ip}[2]{\langle #1,#2\rangle}
+\newcommand{\1}{\mathbf 1}
+\newcommand{\RP}{\mathrm{RP}}
+\newcommand{\NP}{\mathrm{NP}}
+\title{Two-sided 60/40 majority:\\prediction, counting, and compatibility}
+\author{Grisha Pochuev\\\small Independent Researcher\\
+\small\href{https://orcid.org/0009-0005-0078-0857}{ORCID: 0009-0005-0078-0857}\\
+\small\href{mailto:n_854@mail.ru}{n\_854@mail.ru}}
+\date{21 October 2026\\[4pt]\small Manuscript, version 1.0}
+\hypersetup{pdftitle={Two-sided 60/40 majority: prediction, counting, and compatibility},
+pdfauthor={Grisha Pochuev},pdfsubject={Explicit learning guarantees and compatibility hardness},
+pdfkeywords={PAC learning, majority with margins, perceptron, sample compression, NP-completeness}}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We give self-contained prediction guarantees for two precise interpretations of
+two-sided majority with a 60/40 gap. When the percentages are taken within the
+positive and negative indicator groups, centering the Boolean coordinates gives
+a Euclidean margin of $1/5$. A perceptron with an elementary stopping rule learns
+from at most $26\lceil\varepsilon^{-1}\ln(26/\delta)\rceil$ labeled examples,
+independently of dimension. When the percentages are taken among the active
+indicators, we prove the distribution-free counting inequality
+$\ln K_\varepsilon\ge \varepsilon n/5-\ln2$, where $K_\varepsilon$ is the number
+of hypotheses whose incompatibility is at most $\varepsilon$. A normalized
+perceptron consequently uses $O(B^2\log(2+B))$ labels, where
+$B=(\ln K_\varepsilon+\ln(1/\delta))/\varepsilon$ is the raw-count benchmark.
+Both procedures have polynomial bit complexity and require no additional
+unlabeled observations. The first appendix gives a polynomial-time learner
+returning a signed-literal majority, with a sample bound proved by compressed
+descriptions. The second proves NP-completeness of finding an exactly compatible
+partition and derives an $\NP=\RP$ consequence for general polynomial-time
+learning with an output-compatibility guarantee. These are distinct mathematical
+requirements. The classical learning mechanisms are identified explicitly,
+and the results are compared with the polynomial prediction criterion in the
+Blum--Balcan question under stated normalization and output conventions.
+\end{abstract}
+
+\section{The learning criterion and the two promises}
+
+Write $[n]=\{1,\ldots,n\}$, and set $\sgnplus(t)=1$ when $t\ge0$ and $-1$
+otherwise. Throughout, $\mathcal D$ is a distribution on labeled examples
+$(x,y)$, $D$ is its marginal on $x$, and
+\[
+ \err_{\mathcal D}(h)=\Pr_{(X,Y)\sim\mathcal D}[h(X)\ne Y].
+\]
+All examples used for learning are independent and identically distributed
+(iid). We take $0<\varepsilon<1$ and $0<\delta\le1/2$ unless stated otherwise.
+There is no independence assumption between coordinates, and no balance
+assumption on the class probabilities or the unknown group sizes.
+An efficient learner runs in time polynomial in $n$, $1/\varepsilon$,
+$\log(1/\delta)$, and the bit lengths of rational parameter encodings.
+Calls to a fresh iid example source are counted as labeled observations;
+reading a returned $n$-bit point costs $O(n)$ operations. A prediction guarantee
+alone does not require the returned classifier to belong to the target class
+or its defining partition to remain compatible with $D$.
+
+For a finite hypothesis class $C$ and a compatibility function
+$\chi:C\times X\to[0,1]$, define
+\[
+ \unl_D(h)=\mathbb E_{X\sim D}[1-\chi(h,X)],
+ \qquad
+ C_{D,\chi}(\varepsilon)=\{h\in C:\unl_D(h)\le\varepsilon\}.
+\]
+The raw-count labeled-sample benchmark in \cite[Section 3]{bb2007} and
+\cite[Theorem 4]{bb2010} is, up to absolute constants,
+\begin{equation}\label{eq:benchmark}
+ B(C,D,\chi;\varepsilon,\delta)
+ =\frac{\ln|C_{D,\chi}(\varepsilon)|+\ln(1/\delta)}{\varepsilon}.
+\end{equation}
+Replacing $\ln(1/\delta)$ by $\ln(2/\delta)$ changes the comparison only by
+absolute constants in the stated range. The 2007 question explicitly allows
+an efficient algorithm using this many labels or a polynomial in this many.
+Its footnote proposes a cover-based bound as a desirable refinement; it does
+not make that refinement the criterion in \eqref{eq:benchmark}.
+
+We distinguish the following two formal promises.
+
+\paragraph{Group normalization.}
+The coordinates are partitioned as $P\sqcup N=[n]$. Put $a=|P|$, $b=|N|$, and
+\[
+ p(x)=\sum_{i\in P}x_i,\qquad q(x)=\sum_{i\in N}x_i.
+\]
+For $x\in\{0,1\}^n$, the labeled distribution satisfies, almost surely,
+\begin{align}
+ y=1&:\quad p(x)\ge3a/5,\qquad q(x)\le2b/5, \label{eq:groupplus}\\
+ y=-1&:\quad p(x)\le2a/5,\qquad q(x)\ge3b/5. \label{eq:groupminus}
+\end{align}
+Here the percentages are relative to the complete groups, including inactive
+coordinates. The learner knows neither the partition nor its sizes.
+
+\paragraph{Active normalization.}
+For $x\in\{0,1\}^n\setminus\{0\}$, let $k(x)=\norm{x}_1$. There is an unknown
+$s^*\in\{-1,1\}^n$ such that, almost surely,
+\begin{equation}\label{eq:activepromise}
+ y\ip{s^*}{x}\ge k(x)/5.
+\end{equation}
+Thus at least 60\% of the active indicators have the sign of the label.
+The associated class and compatibility function are
+\begin{equation}\label{eq:activeclass}
+ h_s(x)=\sgnplus(\ip{s}{x}),\qquad
+ \chi_{\rm act}(s,x)=
+ \1\{|\ip{s}{x}|\ge k(x)/5\}.
+\end{equation}
+This is the restriction to nonzero examples of the explicit majority model
+in \cite[Appendix A.2]{bb2014supp}. The exclusion is stated here because the
+normalized update divides by $k(x)$.
+
+These are different promises. A positive example with one active positive
+indicator satisfies \eqref{eq:activepromise}, but fails
+\eqref{eq:groupplus} when $|P|\ge2$. Conversely, with
+$(a,b,p,q)=(10,90,6,36)$, the group promise holds for a positive example, while
+the active signed sum is $p-q=-30$. We prove a prediction theorem for each
+promise rather than identify the two.
+
+\paragraph{Organization and scope.}
+Section 3 specializes the classical Euclidean perceptron bound to the group
+promise. Section 4 compares the active promise with its full-function
+approximate-compatibility count. Appendix A supplies an explicit sign-vector
+construction and compressed-description bound. Appendix B proves exact
+compatibility hardness. All probability guarantees refer to iid sampling and
+one fixed realizable target. None asserts recovery of the unknown partition,
+robustness to arbitrary label noise, or a count bound with a separately
+vanishing compatibility tolerance. The historical question is discussed in
+Section 5; no award acceptance or exhaustive priority claim is inferred.
+
+\section{Two elementary learning lemmas}
+
+The following proofs supply both the optimization and statistical ingredients.
+They also specify a finite stopping rule rather than merely an expected-error
+conversion of an online algorithm.
+The first is the classical perceptron analysis associated with
+Novikoff~\cite{novikoff1962}. The consecutive-correct conversion in the second
+is already used by Balcan et al.~\cite[Section 3.2]{bbel2013}; we include a
+proof to fix the adaptive stopping convention and constants, not to claim
+that conversion as new.
+
+\begin{lemma}[Perceptron update bound]\label{lem:perceptron}
+Suppose every feature-label pair $(v,y)$ in a sequence satisfies
+\[
+ \norm{v}_2\le R,\qquad y\ip{u}{v}\ge\rho>0
+\]
+for one fixed vector $u$ with $\norm{u}_2\le U$. Initialize $w=0$, predict
+$\sgnplus(\ip{w}{v})$, and on an incorrect prediction update $w\leftarrow w+yv$.
+There are at most $(UR/\rho)^2$ updates.
+\end{lemma}
+\begin{proof}
+Index only the updates by $j=1,\ldots,M$. On a mistake,
+$y_j\ip{w_{j-1}}{v_j}\le0$, including the specified tie convention. Consequently,
+\[
+ \norm{w_j}_2^2
+ =\norm{w_{j-1}}_2^2+2y_j\ip{w_{j-1}}{v_j}+\norm{v_j}_2^2
+ \le\norm{w_{j-1}}_2^2+R^2.
+\]
+Hence $\norm{w_M}_2^2\le MR^2$, whereas
+\[
+ \ip{u}{w_M}=\sum_{j=1}^M y_j\ip{u}{v_j}\ge M\rho.
+\]
+Cauchy--Schwarz gives $M\rho\le UR\sqrt M$. For $M>0$, squaring after division
+by $\sqrt M$ proves the assertion; $M=0$ is immediate.
+\end{proof}
+
+\begin{lemma}[Consecutive-correct stopping rule]\label{lem:streak}
+Consider an online learner which changes its classifier only on an incorrect
+prediction and which makes at most $M_0$ mistakes on every promised sequence.
+Let
+\[
+ L=\left\lceil\frac{\ln((M_0+1)/\delta)}{\varepsilon}\right\rceil.
+\]
+Run it on fresh iid labeled examples, resetting a counter to zero on every
+mistake and incrementing the counter on every correct prediction. Stop when
+the counter reaches $L$. The procedure uses at most $(M_0+1)L$ examples and
+returns a classifier of error at most $\varepsilon$ with probability at least
+$1-\delta$.
+\end{lemma}
+\begin{proof}
+A phase is an interval between counter resets, beginning initially or
+immediately after a mistake. The classifier is fixed within the phase,
+although a mistake need not change its values everywhere on the domain.
+Each failed phase contains
+at most $L-1$ correct predictions followed by one mistake. The final phase
+contains $L$ correct predictions. There are at most $M_0$ failed phases and
+one final phase, proving the deterministic sample bound and termination.
+
+Condition on the complete history at the beginning of a reached phase. Its
+classifier $h$ is then fixed and all subsequent observations are independent
+of that history. If $\err_{\mathcal D}(h)>\varepsilon$, the conditional
+probability of ending this phase with $L$ correct predictions is at most
+\[
+ (1-\err_{\mathcal D}(h))^L
+ \le (1-\varepsilon)^L
+ \le e^{-\varepsilon L}
+ \le\frac{\delta}{M_0+1}.
+\]
+Average over histories and take a union bound over the at most $M_0+1$ possible
+phase indices. The probability of accepting any classifier of error greater
+than $\varepsilon$ is at most $\delta$.
+\end{proof}
+
+A fixed-sample implementation may draw $(M_0+1)L$ iid examples in advance and
+process the necessary prefix. The implementation achieves this same upper
+bound without a real logarithm oracle. Write $H=M_0+1$, and define
+\begin{equation}\label{eq:exactstreak}
+ L_* = \min\{\ell\in\mathbb Z_{\ge1}:H(1-\varepsilon)^\ell\le\delta\}.
+\end{equation}
+The preceding proof works directly with $L_*$, and
+$L_*\le\lceil\ln(H/\delta)/\varepsilon\rceil$.
+For $\varepsilon=p/q$ and $\delta=r/s$ with positive integer numerators and
+denominators, its test is exactly
+\[
+ Hs(q-p)^\ell\le r q^\ell.
+\]
+Set $j=\lceil\log_2(H/\delta)\rceil$ by integer comparisons and
+$U=\lceil j/\varepsilon\rceil$. Then $U$ is a sufficient upper bound for
+$L_*$. Binary search on $[0,U]$ with the displayed monotone integer test
+finds $L_*$ exactly. The intermediate integers use
+$O(U\log(q+1)+\log(Hs+r))$ bits, which is polynomial in the stated input
+parameters. The shared implementation is \path{pac_thresholds.py}.
+Explicitly capping observations and updates gives a polynomial runtime also
+on inputs outside the promise.
+
+\section{Group normalization: a dimension-independent predictor}
+
+For analysis, define the target signs and centered features by
+\[
+ s_i^*=\begin{cases}1&i\in P,\\-1&i\in N,\end{cases}
+ \qquad z(x)=2x-\1.
+\]
+Both $s^*$ and $z(x)$ have Euclidean norm $\sqrt n$, and
+\begin{equation}\label{eq:centeridentity}
+ \ip{s^*}{z(x)}
+ =(2p(x)-a)-(2q(x)-b).
+\end{equation}
+For a positive example, the first parenthesis is at least $a/5$ and the
+second is at most $-b/5$. For a negative example their inequalities reverse.
+Thus
+\begin{equation}\label{eq:groupmargin}
+ y\ip{s^*}{z(x)}\ge n/5
+\end{equation}
+almost surely. Equivalently, $s^*/\sqrt n$ and $z(x)/\sqrt n$ are unit
+vectors with signed inner product at least $1/5$.
+
+For $n\ge1$, the two branches \eqref{eq:groupplus}--\eqref{eq:groupminus}
+cannot both hold. Indeed, each nonempty group would require its active count
+to be both at least three fifths and at most two fifths of its size.
+Thus the promise determines labels on its support. If one group is empty,
+\eqref{eq:groupmargin} and the argument below are unchanged.
+
+\begin{theorem}[Group-normalized prediction]\label{thm:group}
+Under \eqref{eq:groupplus}--\eqref{eq:groupminus}, there is a learner returning
+\[
+ \widehat h_w(x)=\sgnplus\!\left(\sum_{i=1}^n w_i(2x_i-1)\right),
+ \qquad w\in\mathbb Z^n,
+\]
+with population error at most $\varepsilon$ with probability at least
+$1-\delta$. It uses no additional unlabeled examples and at most
+\begin{equation}\label{eq:groupsample}
+ m_{\rm grp}
+ =26\left\lceil\frac{\ln(26/\delta)}{\varepsilon}\right\rceil
+\end{equation}
+labeled examples. It requires $O(nm_{\rm grp})$ elementary arithmetic operations,
+and every returned coefficient satisfies $|w_i|\le25$.
+\end{theorem}
+\begin{proof}
+Use the perceptron on $z(x)$, with the integral update
+$w\leftarrow w+yz(x)$ on each prediction mistake. Apply
+Lemma~\ref{lem:perceptron} with $U=R=\sqrt n$ and $\rho=n/5$.
+The bound is exactly 25 updates. Lemma~\ref{lem:streak} with $M_0=25$
+gives \eqref{eq:groupsample} and the confidence guarantee.
+Each coordinate changes by $1$ or $-1$ on an update, hence $|w_i|\le25$.
+\end{proof}
+
+\paragraph{Why centering is necessary.}
+In the example $(a,b,p,q)=(10,90,6,36)$, the uncentered score is $-30$, but
+\[
+ 2(p-q)-(a-b)=2(6-36)-(10-90)=20=n/5.
+\]
+The unknown offset is represented automatically through the centered features.
+No estimation of $a$ or $b$ is required.
+
+\paragraph{Bit complexity.}
+Each score has absolute value at most $25n$ and requires
+$O(\log(n+1))$ bits. The counter needs $O(\log L)$ bits. Thus the exact
+integer implementation has polynomial bit complexity; a straightforward bound
+is $O(nm_{\rm grp}\log((n+1)(m_{\rm grp}+1)))$ bit operations, in addition to the polynomial
+work of computing the stopping threshold from the rational input parameters.
+
+\paragraph{Comparison with the raw-count benchmark.}
+Whenever a perfectly compatible target belongs to $C$,
+$|C_{D,\chi}(\varepsilon)|\ge1$. In the range $\delta\le1/2$,
+\[
+ \frac{1+\ln(1/\delta)}{\varepsilon}
+ =O\!\left(B(C,D,\chi;\varepsilon,\delta)\right).
+\]
+Therefore \eqref{eq:groupsample} is $O(B)$, and in particular meets the
+polynomial allowance in the 2007 criterion. This comparison needs neither
+an estimate of the number of compatible partitions nor a specified extension
+of the target classifier away from the compatible support. The probability
+distribution with its given labels is the premise of the theorem.
+
+\section{Active normalization: a counting lemma and a predictor}
+
+In this section use precisely the class and compatibility function
+\eqref{eq:activeclass}. Set
+\[
+ K_\varepsilon
+ =\big|\{s\in\{-1,1\}^n:\unl_D(s)\le\varepsilon\}\big|,
+ \qquad
+ B_{\rm act}=\frac{\ln K_\varepsilon+\ln(1/\delta)}{\varepsilon}.
+\]
+Different sign vectors give different functions on the full instance space:
+$h_s(e_i)=s_i$. Thus $K_\varepsilon$ counts distinct functions, not merely
+different descriptions of one function.
+
+\begin{lemma}[Universal lower bound on the raw count]\label{lem:count}
+For every distribution $D$ on $\{0,1\}^n\setminus\{0\}$ and every
+$0<\varepsilon<1$,
+\begin{equation}\label{eq:countbound}
+ K_\varepsilon\ge
+ \frac{1}{2(1-\varepsilon/5)^n},
+ \qquad
+ \ln K_\varepsilon\ge\frac{\varepsilon n}{5}-\ln2.
+\end{equation}
+In particular,
+\begin{equation}\label{eq:dimension}
+ n\le\frac{5(\ln K_\varepsilon+\ln2)}{\varepsilon}.
+\end{equation}
+\end{lemma}
+\begin{proof}
+Choose a random sign vector $s$ with independent coordinates and
+$\Pr[s_i=-1]=p=\varepsilon/5$. For a fixed nonempty active set
+$S=\{i:x_i=1\}$, let $R_S$ be the number of minus signs in $S$.
+Incompatibility requires
+\[
+ \big||S|-2R_S\big|<|S|/5,
+\]
+and therefore requires $R_S>2|S|/5$. Since $\mathbb E R_S=p|S|$, Markov's
+inequality gives
+\[
+ \Pr_s[\chi_{\rm act}(s,x)=0]
+ \le\Pr_s[R_S>2|S|/5]\le\frac{5p}{2}=\frac{\varepsilon}{2}.
+\]
+Average over $x\sim D$ to obtain
+$\mathbb E_s\unl_D(s)\le\varepsilon/2$. Applying Markov's inequality again
+shows that the set $\unl_D(s)\le\varepsilon$ has probability at least $1/2$
+under this product measure.
+
+Here $p<1/2$, so every individual sign vector has probability at most
+$(1-p)^n$: an atom with $r$ minus signs has probability
+$p^r(1-p)^{n-r}\le(1-p)^n$. It follows that
+$K_\varepsilon(1-p)^n\ge1/2$. Taking logarithms and using
+$-\ln(1-p)\ge p$ proves both assertions.
+\end{proof}
+
+There is also a useful discrete form. If
+$r=\lfloor\varepsilon n/5\rfloor$, choose the minus coordinates uniformly
+among the $r$-subsets of $[n]$. The same two Markov arguments apply, because
+$\mathbb E R_S=r|S|/n\le\varepsilon|S|/5$. At least half these subsets are
+approximately compatible. Consequently,
+\begin{equation}\label{eq:binomialcount}
+ K_\varepsilon\ge\tfrac12\binom nr.
+\end{equation}
+
+\begin{theorem}[Active-normalized prediction]\label{thm:active}
+Under \eqref{eq:activepromise}, a learner returning a rational-weight linear
+classifier uses no additional unlabeled observations and at most
+\begin{equation}\label{eq:activesample}
+ m_{\rm act}
+ =(25n+1)\left\lceil
+ \frac{\ln((25n+1)/\delta)}{\varepsilon}\right\rceil
+\end{equation}
+labeled examples. With probability at least $1-\delta$, the returned classifier
+has error at most $\varepsilon$. The learner has polynomial bit complexity, and
+\begin{equation}\label{eq:activeB}
+ m_{\rm act}=O\!\left(B_{\rm act}^2\log(2+B_{\rm act})\right).
+\end{equation}
+\end{theorem}
+\begin{proof}
+Use the normalized feature
+\[
+ v(x)=\frac{x}{k(x)}.
+\]
+It satisfies $\norm{v(x)}_2=1/\sqrt{k(x)}\le1$ and, by the promise,
+$y\ip{s^*}{v(x)}\ge1/5$. Since $\norm{s^*}_2=\sqrt n$,
+Lemma~\ref{lem:perceptron} gives at most $25n$ mistakes for the update
+$w\leftarrow w+yv(x)$. Prediction may use
+$\sgnplus(\ip{w}{x})$, since $k(x)>0$.
+Lemma~\ref{lem:streak} proves \eqref{eq:activesample} and the error guarantee.
+
+Both constant sign vectors are perfectly compatible, so $K_\varepsilon\ge2$.
+Lemma~\ref{lem:count} now implies
+\[
+ n\le\frac{10\ln K_\varepsilon}{\varepsilon}\le10B_{\rm act},
+ \qquad
+ \frac1\varepsilon\le\frac{B_{\rm act}}{\ln2},
+ \qquad
+ \frac{\ln(1/\delta)}{\varepsilon}\le B_{\rm act}.
+\]
+Substitute these inequalities into \eqref{eq:activesample}. More explicitly,
+\[
+ m_{\rm act}\le
+ (250B_{\rm act}+1)
+ \left[
+ \frac{B_{\rm act}}{\ln2}\ln(250B_{\rm act}+1)
+ +B_{\rm act}+1
+ \right].
+\]
+This is \eqref{eq:activeB}.
+\end{proof}
+
+\paragraph{Exact implementation.}
+Let
+\[
+ Q=\operatorname{lcm}(1,\ldots,n)
+\]
+and store the integer vector $W=Qw$. An update becomes
+\[
+ W\longleftarrow W+y\,\frac{Q}{k(x)}x,
+\]
+and prediction uses $\sgnplus(\ip{W}{x})$. There are at most $25n$ updates,
+so $|W_i|\le25nQ$. The estimate $Q\le n!$ gives
+$\log Q=O(n\log(n+1))$. Computing $Q$ by integer gcd and multiplication,
+and all subsequent predictions and updates, therefore take polynomially many
+bit operations. The integral stopping threshold following
+Lemma~\ref{lem:streak} avoids a logarithm oracle. No optimization or counting
+oracle is used.
+
+\paragraph{Nonempty indicator groups.}
+If both groups must be nonempty, let $K_\varepsilon^{\rm ne}$ count only the
+nonconstant sign vectors. Under the realizability assumption, $s^*$ and
+$-s^*$ are distinct admissible vectors, so $K_\varepsilon^{\rm ne}\ge2$.
+The full count is exactly $K_\varepsilon^{\rm ne}+2$, because the two removed
+constant vectors are always compatible. Equation~\eqref{eq:dimension} gives
+\[
+ n\le
+ \frac{5\ln(2(K_\varepsilon^{\rm ne}+2))}{\varepsilon}
+ \le\frac{15\ln K_\varepsilon^{\rm ne}}{\varepsilon}.
+\]
+For the second inequality, use
+$2(K+2)\le4K\le K^3$ for $K\ge2$.
+The proof of \eqref{eq:activeB} therefore remains valid with the nonempty-group
+count and an altered absolute constant.
+
+\paragraph{What the counting argument uses.}
+The same $\varepsilon$ is used for allowed incompatibility and desired
+prediction error. The proof does not replace $K_\varepsilon$ by $K_0$, by
+a number of equivalence classes on the support, or by a covering number.
+For example, if $D$ is uniform on the pairs
+$x=e_i+e_{i+1}$ of a connected path, perfect compatibility requires adjacent
+signs to agree, so $K_0=2$ for arbitrarily large $n$. No analogue of
+\eqref{eq:dimension} with a fixed zero incompatibility tolerance follows.
+Nor does the argument provide a bound solely in terms of a benchmark with an
+independent tolerance $\eta$ approaching zero. The theorem proves the
+raw-count, same-$\varepsilon$, polynomial criterion as stated; an $O(B_{\rm act})$
+bound or a cover-based refinement is a stronger question.
+
+\section{Prediction, representation, and compatibility}
+
+The preceding results settle the two explicit prediction formulations in this
+note under the raw-count criterion allowing a polynomial in the benchmark.
+The group theorem is stronger in sample size: it is $O(B)$ rather than merely
+polynomial in $B$. Both procedures are standard perceptron updates specialized
+to the promises; their reduction, stopping rule, and count comparison are
+proved here.
+
+There are three different output requirements:
+\begin{enumerate}[itemsep=2pt]
+\item a classifier with small prediction error;
+\item a classifier represented by a sign vector with a specified decision rule;
+\item an explicit partition with small incompatibility under the original 60/40
+inequalities.
+\end{enumerate}
+Appendix~\ref{app:proper} proves the second requirement for the signed-literal
+rule associated with centered coordinates. Appendix~\ref{app:hardness}
+shows why the third requirement has a substantially different computational
+status: exact finite consistency is NP-complete, and a general polynomial-time
+learner guaranteeing small output incompatibility would imply $\NP=\RP$.
+
+\paragraph{Relation to the published wording.}
+The majority paragraph in \cite[Section 3.2]{bb2007}, repeated in
+\cite[Section 6.2]{bb2010}, describes the percentages in words. It does not give
+a formula specifying the majority classifier on incompatible examples. Thus the
+centered signed-literal extension used here is explicitly our defined decision
+rule, not a formula attributed to that paragraph. On every example satisfying
+the group promise, it agrees with the prescribed label. For nonempty groups it
+also agrees there with positive-group majority and inverted negative-group
+majority. Outside that compatible region, these extensions can differ.
+
+The 2014 paper \cite{bb2014} describes its majority setting as a modified form,
+and its supplement \cite[Appendix A.2]{bb2014supp} explicitly uses fractions
+of the active indicators. Our second theorem analyzes that precise class.
+
+\paragraph{Relation to closest-string approximation and prior methods.}
+For a labeled sample, put $u_j=y_j(2x_j-\1)\in\{-1,1\}^n$.
+The group promise implies
+\[
+ d_H(s^*,u_j)=\frac{n-\ip{s^*}{u_j}}2\le\frac{2n}{5}.
+\]
+The closest-string approximation scheme of Li, Ma, and
+Wang~\cite[Theorem 2.6]{lmw2002}, with approximation ratio $9/8$, therefore
+returns a sign vector $s$ with $d_H(s,u_j)\le9n/20$ and hence
+$y_j\ip{s}{2x_j-\1}\ge n/10$ on every training observation.
+This is our direct application of their theorem, not a majority-learning
+claim made in that paper. It already gives polynomial-time fitting with a
+constant margin. Combining it with uniform margin bounds, such as
+\cite[Theorem 3]{bb2014} for the Euclidean unit ball, yields dimension-independent
+PAC learning as well. Accordingly, no priority claim for the existence of a
+sign-vector learner is made here. Appendix A supplies a different finite-bit
+construction and an explicit compressed-description bound, with all constants
+proved. The general use of sample compression for learnability is classical;
+see Floyd and Warmuth~\cite{fw1995}.
+
+\paragraph{Related compatibility hardness.}
+Balcan et al.~\cite[Supplement, Section 2, Theorem 4]{bbel2013supp} already
+prove that finding a consistent and compatible two-sided disjunction is
+NP-hard. That problem has a different concept class and compatibility
+condition. Appendix B gives a self-contained reduction for the fixed group
+60/40 inequalities, including balanced points and a connected Hamming-4 graph;
+it does not claim the first hardness result for compatibility-constrained
+learning in general.
+
+\paragraph{Learning outside the target class.}
+The framework in \cite[Section 2]{bb2010} states a prediction-error goal.
+Its finite-class sufficient method uses an empirically correct and compatible
+member of $C$; that sufficient method is not itself a restriction requiring
+every learner to output such a member. As further evidence about the model,
+\cite[Section 3.2, Algorithm 2 and Theorem 2]{bbel2013} explicitly studies a
+non-proper learner that returns a low-error hypothesis not necessarily
+consistent or compatible. That later result has its own distributional
+parameters; we cite it for the nature of its output guarantee, not as evidence
+that another prize was awarded or that all versions of the 2007 problems were
+already resolved.
+
+The mathematical conclusions are for the explicit promises and resource
+criterion stated here. They do not identify a full-function count with a
+distributional covering number, or the label-error tolerance with an
+independently specified smaller compatibility tolerance. Priority beyond the
+comparisons above, any intended stronger interpretation of the historical
+question, and acceptance of a submission are not established by these proofs.
+
+\section*{Reproducibility and assistance}
+
+The accompanying package places Python files in \path{code/}, complete
+verification records in \path{results/}, and internal review reports in
+\path{audit/}. The weighted predictors are implemented in \path{majority_6040.py} for group
+normalization and \path{majority_active.py} for active normalization.
+The representation learner is \path{proper_signed_majority.py}.
+Finite checks are supplied by \path{verify_6040.py} for the first predictor,
+\path{verify_active.py} for the active count and predictor,
+\path{check_proper.py} for the sign-vector construction, and
+\path{verify_reduction.py} for the compatibility reduction.
+The shared exact stopping threshold and its minimality are checked by
+\path{verify_thresholds.py}. The package-level \path{run_all_checks.py}
+runs these checks in an isolated temporary directory and records their outputs.
+
+The initial exhaustive margin checks, through $n=10$, examine
+1,398,100 partition--example pairs, including 406,868 admissible labeled
+pairs, and attain the claimed minimum normalized margin $1/5$.
+They include empty and unequal groups. The active-version checks include
+exact rational finite counts, stopping-probability inequalities, and 64
+iid learning trials on explicitly specified finite distributions.
+Supplemental checks cover all clipped coefficient values and five-bit rounding
+inputs, small-domain enumeration, large-dimensional correction and rounding,
+and three finite instances of the compatibility reduction. These checks support
+the implementations and expose edge cases; no universal claim in this note is
+inferred from finite experiments or a solver status. The proofs below and above
+supply the general guarantees.
+
+This manuscript and its code were prepared with assistance from ChatGPT
+(GPT-6 Astra), including separately assigned mathematical and source-review
+passes. These are internal AI-assisted checks, not external peer review or
+formal verification by a proof assistant. All claims are supported by the
+mathematical arguments in the manuscript, rather than by the review process.
+
+\appendix
+\section{Returning a signed-literal majority}\label{app:proper}
+
+This appendix gives a stronger representation guarantee for the group-normalized
+prediction task. Its decision rule is specified throughout; output compatibility
+is not asserted.
+
+\begin{theorem}[A sign-vector output with a compressed-description proof]
+\label{thm:proper}
+Suppose $n\ge1$, $0<\varepsilon<1$, $0<\delta\le1/2$, and there is
+$s^*\in\{-1,1\}^n$ with
+\[
+ y\ip{s^*}{2x-\1}\ge n/5
+\]
+almost surely. Put
+\begin{align}
+ q&=\left\lceil\log_2(2/\delta)\right\rceil, \label{eq:properq}\\
+ r&=\min\{j\in\mathbb Z_{\ge0}:
+       \varepsilon 2^j\ge512(j+2)+q\},\qquad m=2^r. \label{eq:properm}
+\end{align}
+There is a randomized learner using $m$ iid labeled observations, no additional
+unlabeled observations, and at most $5nq$ independent random bits, which runs
+in time polynomial in $n,1/\varepsilon,\log(1/\delta)$ and returns
+$s\in\{-1,1\}^n$ such that
+\[
+ h_s^{\rm lit}(x)=\sgnplus(\ip{s}{2x-\1})
+\]
+has error at most $\varepsilon$ with probability at least $1-\delta$.
+Moreover,
+\begin{equation}\label{eq:properexplicit}
+ m\le
+ \frac{2048\big(q+\lceil\log_2(1/\varepsilon)\rceil+12\big)}{\varepsilon}.
+\end{equation}
+\end{theorem}
+
+The returned vector defines $P=\{i:s_i=1\}$ and $N=\{i:s_i=-1\}$.
+The rule is the majority of the $n$ literals $x_i$ for $i\in P$ and
+$1-x_i$ for $i\in N$:
+\begin{equation}\label{eq:literalrule}
+ h_s^{\rm lit}(x)=1
+ \quad\Longleftrightarrow\quad
+ p(x)+|N|-q(x)\ge n/2.
+\end{equation}
+This rule may differ from majority over $P$ alone on incompatible examples.
+The premise of Theorem~\ref{thm:proper} follows from the original group
+promise by \eqref{eq:centeridentity}--\eqref{eq:groupmargin}.
+
+\subsection{An exact-arithmetic construction}
+
+Before drawing the sample, independently draw $q$ tables
+$R^{(1)},\ldots,R^{(q)}$, each consisting of $n$ independent uniform integers
+from $\{0,\ldots,31\}$. Each entry uses exactly five fair bits. This choice is
+independent of the labeled observations. The same distribution of tables can
+be implemented by lazy access to independent prespecified bits.
+
+Draw $(x_j,y_j)$ for $1\le j\le m$, set $z_j=2x_j-\1$, and put
+$b=\lceil\log_2(2m)\rceil$.
+
+\paragraph{Small-dimensional branch: $n<512b$.}
+Enumerate the sign vectors in a fixed order and return the first satisfying
+\begin{equation}\label{eq:properenum}
+ 5y_j\ip{s}{z_j}\ge n\qquad(1\le j\le m).
+\end{equation}
+The promise supplies such a vector. On an input outside the promise with no
+such vector, return an arbitrary vector with a failure flag.
+
+\paragraph{Large-dimensional branch: $n\ge512b$.}
+Initialize $a=0\in\mathbb Z^n$. If some sample observation satisfies
+$y_j\ip{a}{z_j}<2n$, perform the coordinatewise correction
+\begin{equation}\label{eq:clip}
+ a_i\longleftarrow
+ \max\{-16,\min\{16,a_i+y_jz_{j,i}\}\}\qquad(1\le i\le n),
+\end{equation}
+and restart the scan. Stop correcting when there is no violation. Impose a
+cap of 183 corrections, returning failure if the cap is reached;
+this only specifies bounded behavior outside the promise.
+
+For each table $\ell=1,\ldots,q$, form a sign vector by
+\begin{equation}\label{eq:round}
+ s_i^{(\ell)}
+ =\begin{cases}
+ 1 & R_i^{(\ell)}<a_i+16,\\
+ -1 & R_i^{(\ell)}\ge a_i+16.
+ \end{cases}
+\end{equation}
+Return the first such vector with
+\begin{equation}\label{eq:roundaccept}
+ 16y_j\ip{s^{(\ell)}}{z_j}\ge n
+ \qquad(1\le j\le m).
+\end{equation}
+If all tables fail, return an arbitrary vector with a failure flag.
+
+\subsection{At most 182 corrections}
+
+Fix $t=16s^*$. The potential $\Phi(a)=\norm{a-t}_2^2$ starts at $256n$.
+On a violated observation,
+\[
+ y_j\ip{t-a}{z_j}>
+ (16/5-2)n=6n/5.
+\]
+Before clipping,
+\[
+ \Phi(a+y_jz_j)
+ =\Phi(a)-2y_j\ip{t-a}{z_j}+\norm{z_j}_2^2
+ <\Phi(a)-7n/5.
+\]
+Clipping coordinatewise to $[-16,16]^n$ cannot increase the distance to $t$,
+since $t$ belongs to this box. After $k$ corrections, nonnegativity of the
+potential would therefore require $k<1280/7$. Hence at most 182 corrections
+are possible, the cap is not reached on promised inputs, and the final
+$v=a/16$ satisfies
+\begin{equation}\label{eq:roundmean}
+ y_j\ip{v}{z_j}\ge n/8
+ \qquad(1\le j\le m).
+\end{equation}
+
+\subsection{A rounding trial succeeds with probability at least one half}
+
+Condition on the sample and the resulting $a$. For each coordinate,
+\[
+ \mathbb E s_i^{(\ell)}
+ =2\frac{a_i+16}{32}-1=\frac{a_i}{16}.
+\]
+For a fixed observation, the independent variables
+$X_i=y_js_i^{(\ell)}z_{j,i}$ lie in $[-1,1]$ and their sum has mean at least
+$n/8$ by \eqref{eq:roundmean}.
+
+We use the classical bounded-variable estimate of Hoeffding~\cite{hoeffding1963}.
+For completeness, if a bounded random variable $V$ takes values in an interval
+of length $c$, then
+\begin{equation}\label{eq:mgf}
+ \mathbb E e^{\lambda(V-\mathbb EV)}
+ \le e^{\lambda^2c^2/8}.
+\end{equation}
+Indeed, the second derivative of the logarithm of this moment-generating
+function is the variance under an exponentially tilted distribution. A
+variable in an interval of length $c$ has variance at most $c^2/4$, as follows
+by bounding its squared distance from the midpoint. The logarithm and its first
+derivative vanish at zero; integrating the second-derivative bound twice proves
+\eqref{eq:mgf}. Multiplication for independent variables and optimized
+exponential Markov give
+\[
+ \Pr\!\left[\sum_i X_i-\mathbb E\sum_i X_i\le-u\right]
+ \le e^{-u^2/(2n)}.
+\]
+Take $u=n/16$. Failure of \eqref{eq:roundaccept} on a fixed observation has
+probability at most $e^{-n/512}$. A union bound over the sample gives
+\[
+ \Pr[\text{one table fails}]
+ \le me^{-n/512}\le me^{-b}\le\tfrac12,
+\]
+because $b=\lceil\log_2(2m)\rceil\ge\ln(2m)$. The tables are independent, so
+the probability that all $q$ fail is at most $2^{-q}\le\delta/2$.
+
+\subsection{Generalization from compressed descriptions}
+
+\paragraph{Large-dimensional branch.}
+First condition on all the presampled rounding tables, which are independent
+of the observations. The corrected vector $a$ can be reconstructed by replaying
+the ordered sequence of the at most 182 observations on which corrections
+were made. An observation may appear several times in this sequence.
+Start at zero, replay the corrections \eqref{eq:clip}, and then apply a
+specified rounding table. This fully describes the output.
+
+Fix an ordered sequence $I$ of $k\le182$ sample indices and a table index.
+Condition on the observations at the distinct indices in $I$. The reconstructed
+classifier is now fixed, and at least $m-k$ remaining observations are still
+iid from $\mathcal D$. Therefore
+\[
+ \Pr[\text{this classifier has error}>\varepsilon
+       \text{ and is correct on all }m\text{ observations}]
+ \le (1-\varepsilon)^{m-k}
+ \le e^{-\varepsilon(m-182)}.
+\]
+There are at most
+\[
+ q\sum_{k=0}^{182}m^k\le183q\,m^{182}
+\]
+descriptions. Every accepted output is one of them and is correct on the
+whole sample. A union bound, followed by averaging over the tables, yields
+\begin{equation}\label{eq:compressionbound}
+ \Pr[\text{accepted output has error}>\varepsilon]
+ \le183q\,m^{182}e^{-\varepsilon(m-182)}.
+\end{equation}
+This argument includes all possible correction-index sequences and all table
+indices. It therefore accounts for their adaptive selection; it does not
+condition on the event that the actual algorithm chose a particular sequence.
+
+\paragraph{Small-dimensional branch.}
+For a fixed sign-vector classifier of error greater than $\varepsilon$, the
+probability of correctness on all $m$ observations is at most
+$e^{-\varepsilon m}$. There are $2^n$ sign vectors. Since
+$n<512\lceil\log_2(2m)\rceil$ and $2^{\lceil\log_2(2m)\rceil}\le4m$,
+\begin{equation}\label{eq:smallbound}
+ \Pr[\text{accepted output has error}>\varepsilon]
+ \le2^n e^{-\varepsilon m}
+ \le(4m)^{512}e^{-\varepsilon m}.
+\end{equation}
+
+\paragraph{The sample size bounds both probabilities.}
+By \eqref{eq:properm}, $m=2^r$ and
+$\varepsilon m\ge512(r+2)+q$. Thus
+\[
+ (4m)^{512}e^{-\varepsilon m}
+ =\exp\big(512\ln2\,(r+2)-\varepsilon m\big)
+ \le e^{-q}\le\delta/2.
+\]
+The same sample choice gives $m>q$ and $m>183$. Subtracting the logarithm of
+the right side of \eqref{eq:compressionbound} from that of
+\eqref{eq:smallbound} gives
+\[
+ 512\ln4+330\ln m-\ln q-\ln183-182\varepsilon
+ >
+ 512\ln4+329\ln m-\ln183-182>0.
+\]
+Hence the large-branch generalization failure bound is also at most
+$\delta/2$. Adding its rounding failure probability at most $\delta/2$ proves
+the confidence guarantee. The small branch has no construction failure on
+promised inputs.
+
+\subsection{The explicit sample bound and bit complexity}
+
+Let $k=\lceil\log_2(1/\varepsilon)\rceil$ and $A=q+k+12$. Let $m_0=2^{r_0}$
+be the least power of two at least $1024A/\varepsilon$. Then
+\[
+ m_0\le2048A/\varepsilon,\qquad
+ r_0\le11+k+\log_2 A.
+\]
+Since $\log_2 A\le A$ and $q\ge2$,
+\[
+ 2A\ge13+k+\log_2 A+q/512.
+\]
+For example, replacing $\log_2 A$ by $A$ reduces the last inequality to
+$q(511/512)\ge1$. Consequently,
+\[
+ \varepsilon m_0\ge1024A\ge512(r_0+2)+q.
+\]
+Minimality in \eqref{eq:properm} gives $m\le m_0$, proving
+\eqref{eq:properexplicit} and therefore
+\[
+ m=O\!\left(
+ \frac{1+\log(1/\varepsilon)+\log(1/\delta)}{\varepsilon}
+ \right).
+\]
+
+If $\varepsilon=u/v$ is rational, the integer $r$ is found by successive exact
+comparisons
+\[
+ u\,2^r\ge v\big(512(r+2)+q\big).
+\]
+All other logarithmic ceilings are likewise obtained by integer comparisons
+to powers of two. The algorithm implements no irrational normalization.
+
+Each $a_i$ is an integer in $[-16,16]$, and a dot product uses
+$O(\log(n+1))$ bits. The correction procedure takes at most 183 full scans.
+The large branch has a straightforward bit bound
+\[
+ O\big(nm(183+q)\log((n+1)(m+1))\big).
+\]
+The small branch checks at most $(4m)^{512}$ candidates, with bit bound
+\[
+ O\big((4m)^{512}nm\log((n+1)(m+1))\big).
+\]
+Both are polynomials with absolute constant exponents. Sample and table
+storage uses $O(n(m+q))=O(nm)$ bits. The enumeration exponent is large;
+this is a polynomial-time existence theorem rather than a practically
+attractive replacement for Theorem~\ref{thm:group}.
+
+\paragraph{Optional nonempty output groups.}
+If the target is assumed to have both groups nonempty and the output must
+also do so, restrict the small-branch enumeration accordingly. In the large
+branch, if an accepted vector is constant, flip one fixed coordinate.
+This changes each signed training score by at most 2; since
+$n\ge512b\ge512$, the original lower bound $n/16$ remains strictly positive.
+The repaired output is still correct on the entire sample and is a
+deterministic function of the same compressed description. Thus the
+generalization argument and sample size are unchanged. Exact 60/40
+compatibility of this output remains outside the conclusion.
+
+\section{Exact group-normalized compatibility is NP-complete}
+\label{app:hardness}
+
+Consider the following finite decision problem. The input is a list of
+$x\in\{0,1\}^n$, without labels. Does some partition $P\sqcup N=[n]$ make every
+point satisfy either \eqref{eq:groupplus} or \eqref{eq:groupminus}?
+
+\begin{theorem}\label{thm:npcomplete}
+This decision problem is NP-complete. It remains NP-complete when every input
+point has exactly $n/2$ active coordinates and there is a connected graph on
+the input points whose edges all have Hamming distance exactly 4.
+In the reduction below, every YES instance admits a partition for which all
+points satisfy the positive branch.
+\end{theorem}
+
+The result concerns construction of a compatible partition, not prediction
+under the promise. We give the reduction in full.
+
+\subsection{Two consequences of the compatibility inequalities}
+
+For any partition and example, write
+\[
+ z=2x-\1,\quad
+ s_i=\begin{cases}1&i\in P,\\-1&i\in N,\end{cases}
+ \quad A=\ip{s}{z},\quad S=\sum_i s_i,\quad Z=\sum_i z_i.
+\]
+The two inequalities for branch $y\in\{-1,1\}$ are equivalent to
+\begin{equation}\label{eq:fullcompat}
+ 5yA\ge n+|S-5yZ|.
+\end{equation}
+To verify this directly, use
+\[
+ |P|=(n+S)/2,\quad |N|=(n-S)/2,
+ \quad p=(n+S+Z+A)/4,\quad q=(n-S+Z-A)/4.
+\]
+For $y=1$, substitution gives
+$5A\ge n+S-5Z$ and $5A\ge n-S+5Z$, whose conjunction is
+\eqref{eq:fullcompat}. For $y=-1$ it gives
+$-5A\ge n+S+5Z$ and $-5A\ge n-S-5Z$, proving the other case.
+
+In particular, $yA\ge n/5$. If $A=n/5$ and $Z=0$ on the positive branch,
+then \eqref{eq:fullcompat} forces $S=0$.
+
+A second consequence is that two compatible points on opposite branches
+have Hamming distance at least $n/5$. Their positive-group active counts
+differ by at least $|P|/5$, and their negative-group counts differ in the
+opposite direction by at least $|N|/5$. The sum of these two differences is
+bounded above by their Hamming distance.
+
+\subsection{A suitable satisfiability source problem}
+
+Use exact-2-in-4-SAT with signed literals and four distinct variables in each
+clause. In sign notation, a clause has the form
+\begin{equation}\label{eq:exacttwo}
+ \sum_{j=1}^4\lambda_j t_{i_j}=0,
+ \qquad t_i\in\{-1,1\},\quad\lambda_j\in\{-1,1\},
+\end{equation}
+where the $i_j$ are distinct. The equation means that exactly two of the
+four signed literals are true.
+
+For completeness, its NP-hardness follows from the standard NP-complete
+3-SAT problem~\cite{cook1971}, with three distinct
+variables per clause. Introduce a common variable $F$ and replace a clause
+$(a\lor b\lor c)$ by $\operatorname{NAE}(a,b,c,F)$, where NAE requires that
+the displayed truth values are not all equal. Global complementation of all
+variables preserves NAE, including signed literals. A satisfying assignment
+may therefore be oriented to make $F$ false; then these requirements are
+exactly the original OR clauses.
+
+With a fresh variable $d$ for each such clause, replace
+\[
+ \operatorname{NAE}(a,b,c,F)
+ \quad\text{by}\quad
+ \operatorname{NAE}(a,b,d)\ \land\
+ \operatorname{NAE}(\neg d,c,F).
+\]
+If $a=b$, the first condition forces $d$ opposite to them, and the second
+condition excludes exactly the case $a=b=c=F$. If $a\ne b$, the first
+condition permits either $d$, and a choice satisfying the second always
+exists. This proves the equivalence after existentially quantifying $d$.
+
+Finally replace every $\operatorname{NAE}(L_1,L_2,L_3)$ by the exact-two
+condition on $(L_1,L_2,L_3,w)$ with a fresh $w$. The sum of the first three
+Boolean truth values can be completed to 2 by a Boolean $w$ exactly when
+that sum is 1 or 2. All clauses constructed this way have four distinct
+variables. Membership in NP is immediate. The usual distinct-variable
+version of 3-SAT causes no restriction: a shorter non-tautological clause
+can be padded with fresh variables and both choices of their signs.
+
+\subsection{The reduction}
+
+Pad with unused variables until the number $v$ of variables is a multiple
+of four and $v\ge12$. Write
+\[
+ h=v/2,\qquad m_A=v/2,\qquad n=5v/2.
+\]
+Use $v$ pairs of free coordinates $(i,0),(i,1)$, and $m_A$ anchor coordinates.
+Fix an anchor vector $a$ containing $v/4$ plus signs and $v/4$ minus signs.
+For every balanced free row $r\in\{-1,1\}^{2v}$ used below, define
+\begin{equation}\label{eq:reductionrow}
+ z_r=(a,r),\qquad x_r=(\1+z_r)/2.
+\end{equation}
+Both parts are balanced, so $Z=0$ and every $x_r$ has exactly $n/2$ active
+coordinates.
+
+\paragraph{Core rows forcing opposite signs in every free pair.}
+For $e\in\{-1,1\}^v$ with $\sum_i e_i=0$, let
+\[
+ R(e)=(e_1,e_1,e_2,e_2,\ldots,e_v,e_v).
+\]
+Let $I=\{1,\ldots,h\}$, $J=\{h+1,\ldots,v\}$, and let $e^0$ be plus on $I$
+and minus on $J$. Use the following spanning tree of the complete bipartite
+graph with sides $I,J$:
+\[
+ \mathcal T=
+ \{(1,j):j\in J\}
+ \ \cup\
+ \{(i,h+1):i\in I,\ i\ne1\}.
+\]
+For each edge $(i,j)$, let $e^{ij}$ be obtained from $e^0$ by exchanging its
+signs at $i,j$. Put the $v$ rows $R(e^0)$ and $R(e^{ij})$ into the core list,
+and put their negatives into the list as well.
+
+\paragraph{Clause rows.}
+For a clause \eqref{eq:exacttwo}, set its four participating pairs to
+$(\lambda_j,-\lambda_j)$. Among the remaining $v-4$ pairs, use $(1,1)$ on
+exactly $(v-4)/2$ pairs and $(-1,-1)$ on the others, in a fixed order.
+This gives a balanced row $r_c$. Include both $r_c$ and $-r_c$.
+
+\paragraph{Connecting paths.}
+Connect each core row to $R(e^0)$ by adding rows when necessary.
+For a clause row or its negative, first replace its four mixed pairs by
+two $(1,1)$ pairs and two $(-1,-1)$ pairs. Exactly one coordinate of each
+mixed pair changes, so this step has Hamming distance 4 and results in a
+balanced pure-pair row $R(e)$.
+
+For a balanced pure-pair row, repeatedly exchange a plus pair outside $I$
+with a minus pair inside $I$ until reaching $R(e^0)$. Each exchange changes
+four coordinates and preserves balance; at most $h$ exchanges are needed.
+All intermediate rows after the first step are pure-pair rows.
+
+If the formula has $c$ clauses, the resulting list contains
+$M=O((v+c)v)$ rows. The construction is polynomial. The paths supply a
+connected graph on the corresponding points, and every edge has Hamming
+distance 4. Crucially,
+\[
+ 4<n/5=v/2
+\]
+because $v\ge12$.
+
+\subsection{A satisfying assignment gives compatibility}
+
+Let $t$ solve \eqref{eq:exacttwo} for every clause. Set $s=a$ on the anchors,
+and set the two free signs of pair $i$ to $(t_i,-t_i)$. Then $S=0$.
+
+For every pure-pair row, the free inner product is zero because each pair
+cancels. For a clause row $r_c$, the inactive pure pairs cancel and the
+free inner product is
+\[
+ 2\sum_{j=1}^4\lambda_j t_{i_j}=0.
+\]
+The same holds for its negative. All additional path rows are pure-pair rows,
+so the free inner product vanishes on every constructed row. Hence
+\[
+ \ip{s}{z_r}=m_A=n/5,\qquad Z=0,\qquad S=0
+\]
+for every point. Equation~\eqref{eq:fullcompat} holds with equality on the
+positive branch. More explicitly, both groups have size $n/2$ and
+\[
+ p(x_r)=3n/10,\qquad q(x_r)=n/5.
+\]
+Thus every input point is compatible with the positive branch.
+
+\subsection{A compatible partition gives a satisfying assignment}
+
+Suppose one partition makes all constructed points compatible. The branches
+are well defined because $n\ge1$. Adjacent points in the path graph cannot
+have opposite branches: their Hamming distance is 4, strictly less than $n/5$.
+Connectedness forces the same branch everywhere. If it is the negative
+branch, interchange $P$ and $N$. We may assume all points use the positive
+branch.
+
+Write $s_A,s_F$ for the anchor and free parts. The core list contains
+$r^0=R(e^0)$ and $-r^0$. Applying \eqref{eq:fullcompat}, or its consequence
+$A\ge n/5=m_A$, gives
+\[
+ \ip{s_A}{a}+\ip{s_F}{r^0}\ge m_A,\qquad
+ \ip{s_A}{a}-\ip{s_F}{r^0}\ge m_A.
+\]
+Adding shows $\ip{s_A}{a}\ge m_A$. There are only $m_A$ anchor coordinates,
+so $s_A=a$ coordinate by coordinate. The two inequalities now force
+$\ip{s_F}{r^0}=0$. For this row, $A=m_A=n/5$ and $Z=0$, so
+\eqref{eq:fullcompat} implies $S=0$. The anchors are balanced; consequently
+$\sum s_F=0$.
+
+Every other core row $r$ also appears with its negative, so the same argument
+now gives $\ip{s_F}{r}=0$. Define
+\[
+ T_i=s_{i,0}+s_{i,1}.
+\]
+We have $\sum_iT_i=0$. Orthogonality to $R(e^0)$ and $R(e^{ij})$, whose
+difference changes the repeated signs at $i,j$, yields $T_i=T_j$ on every
+edge of $\mathcal T$. Since $\mathcal T$ is connected, all $T_i$ are equal.
+Their sum is zero, so $T_i=0$ for each $i$. Thus
+$s_{i,1}=-s_{i,0}$.
+
+Set $t_i=s_{i,0}$. For each clause row, all inactive pure pairs contribute
+zero and orthogonality becomes
+\[
+ 2\sum_{j=1}^4\lambda_jt_{i_j}=0.
+\]
+This gives a satisfying assignment of the exact-2-in-4 instance.
+
+The two directions prove the reduction. A proposed partition is an $n$-bit
+certificate, and all its counts and inequalities can be checked in polynomial
+time. This proves Theorem~\ref{thm:npcomplete}.
+
+\subsection{Consequence for a learner required to output compatibility}
+
+\begin{corollary}\label{cor:rp}
+Suppose a polynomial-time learner, on every perfectly group-compatible
+distribution, returns an explicit partition with incompatibility at most
+$\varepsilon$ with probability at least $1-\delta$, for arbitrary positive
+accuracy and confidence parameters. The learner may also require correctly
+labeled examples and may additionally promise small prediction error.
+If its runtime is polynomial in $n,1/\varepsilon,\log(1/\delta)$, then
+$\NP=\RP$.
+\end{corollary}
+\begin{proof}
+Given the constructed list of $M$ points, pad it by repetitions of its first
+point to a list of length
+\[
+ M'=2^{\lceil\log_2 M\rceil}<2M.
+\]
+Take the uniform distribution over these $M'$ positions and supply label $+1$
+whenever requested. Sampling one position uses exactly $\log_2M'$ fair bits,
+so the simulation has a strict polynomial time bound; no rejection sampling
+is needed. Every distinct original point has probability at least $1/M'$.
+Choose
+\[
+ \varepsilon=\frac1{2M'},\qquad\delta=\frac14.
+\]
+
+In a YES instance, the all-positive labeled distribution is realizable by
+the forward direction of the reduction. With probability at least $3/4$ the
+learner returns a partition of incompatibility at most $\varepsilon$.
+Such a partition must be compatible with every original point, since even
+one incompatible point has mass at least $1/M'>\varepsilon$.
+
+Run the learner and verify its returned partition on the entire finite list.
+For a NO instance this verification always rejects, regardless of the learner's
+behavior. For a YES instance it accepts with probability at least $3/4$.
+The chosen inverse accuracy is polynomial in the formula size. If runtime is
+only specified on promised inputs, stop the learner at its stated polynomial
+clock and reject on timeout. Any sample allowance polynomial in the raw count
+benchmark is also polynomial here, since the number of partitions is at most
+$2^n$.
+
+We have a randomized polynomial-time algorithm for an NP-complete problem
+with no false acceptance and success probability at least $3/4$ on YES inputs.
+Thus $\NP\subseteq\RP$. Conversely, a successful polynomial-length random
+string is an NP witness for an RP acceptance, giving $\RP\subseteq\NP$.
+Therefore $\NP=\RP$.
+\end{proof}
+
+The corollary concerns incompatibility of the \emph{output partition}.
+It does not obstruct a predictor with small classification error, nor the
+signed-literal representation guarantee in Appendix~\ref{app:proper}.
+Indeed, all examples in the YES direction of this reduction have the same
+label, while finding a compatible partition still encodes the satisfiability
+problem.
+
+\begin{thebibliography}{99}
+\bibitem{bb2007}
+Avrim Blum and Maria-Florina Balcan.
+\emph{Open Problems in Efficient Semi-Supervised PAC Learning}.
+COLT 2007, Sections 3 and 3.2.
+\url{https://home.ttic.edu/~avrim/Papers/openproblems.pdf}.
+
+\bibitem{bb2010}
+Maria-Florina Balcan and Avrim Blum.
+\emph{A Discriminative Model for Semi-Supervised Learning}.
+Journal of the ACM 57(3), Article 19, pp.~1--46, 2010.
+DOI: \href{https://doi.org/10.1145/1706591.1706599}{10.1145/1706591.1706599}.
+Author manuscript, 2009, Sections 2, 3.1.1, and 6.2.
+\url{https://home.ttic.edu/~avrim/Papers/labeled_unlabeled-2009.pdf}.
+
+\bibitem{bbel2013}
+Maria-Florina Balcan, Christopher Berlind, Steven Ehrlich, and Yingyu Liang.
+\emph{Efficient Semi-supervised and Active Learning of Disjunctions}.
+ICML 2013, Proceedings of Machine Learning Research 28(1), pp.~633--641.
+\url{https://proceedings.mlr.press/v28/balcan13.pdf}.
+
+\bibitem{bbel2013supp}
+Maria-Florina Balcan, Christopher Berlind, Steven Ehrlich, and Yingyu Liang.
+Supplementary material to \cite{bbel2013}, Section 2, Theorem 4.
+\url{https://proceedings.mlr.press/v28/balcan13-supp.pdf}.
+
+\bibitem{bb2014}
+Maria-Florina Balcan and Christopher Berlind.
+\emph{A New Perspective on Learning Linear Separators with Large
+$L_qL_p$ Margins}.
+AISTATS 2014, Proceedings of Machine Learning Research 33, pp.~68--76.
+\url{https://proceedings.mlr.press/v33/balcan14.pdf}.
+
+\bibitem{bb2014supp}
+Maria-Florina Balcan and Christopher Berlind.
+Supplementary material to \cite{bb2014}, Appendix A.2.
+\url{https://proceedings.mlr.press/v33/balcan14-supp.pdf}.
+
+\bibitem{novikoff1962}
+A. B. J. Novikoff.
+\emph{On Convergence Proofs for Perceptrons}.
+Presented at the Symposium on the Mathematical Theory of Automata,
+April 1962; pp.~615--622 in the archived manuscript.
+\url{https://cs.uwaterloo.ca/~y328yu/classics/novikoff.pdf}.
+
+\bibitem{fw1995}
+Sally Floyd and Manfred Warmuth.
+\emph{Sample Compression, Learnability, and the Vapnik--Chervonenkis Dimension}.
+Machine Learning 21, pp.~269--304, 1995.
+\url{https://doi.org/10.1007/BF00993593}.
+
+\bibitem{hoeffding1963}
+Wassily Hoeffding.
+\emph{Probability Inequalities for Sums of Bounded Random Variables}.
+Journal of the American Statistical Association 58(301), pp.~13--30, 1963.
+\url{https://doi.org/10.1080/01621459.1963.10500830}.
+
+\bibitem{cook1971}
+Stephen A. Cook.
+\emph{The Complexity of Theorem-Proving Procedures}.
+Proceedings of the Third Annual ACM Symposium on Theory of Computing,
+pp.~151--158, 1971.
+\url{https://doi.org/10.1145/800157.805047}.
+
+\bibitem{lmw2002}
+Ming Li, Bin Ma, and Lusheng Wang.
+\emph{On the Closest String and Substring Problems}.
+Journal of the ACM 49(2), pp.~157--171, 2002.
+\url{https://doi.org/10.1145/506147.506150}.
+\end{thebibliography}
+
+\end{document}

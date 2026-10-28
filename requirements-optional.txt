@@ -1,0 +1,4 @@
+# Required only for --with-solver; Python >=3.11.
+# Versions used for the archived run.
+numpy==2.3.5
+scipy==1.17.0

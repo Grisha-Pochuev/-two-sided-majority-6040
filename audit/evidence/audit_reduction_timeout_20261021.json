@@ -1,0 +1,163 @@
+{
+  "status": "INCONCLUSIVE",
+  "solver_requested": true,
+  "notice": "Finite checks are not a proof; the manuscript gives the universal reduction.",
+  "checks": {
+    "input_validation": {
+      "invalid_calls_rejected": 12,
+      "high_index_dimension": 40,
+      "high_index_candidate_assignments_checked": 16,
+      "status": "PASS"
+    },
+    "local_gadgets": {
+      "nae4_truth_cases": 16,
+      "nae3_truth_cases": 8,
+      "composed_nae4_truth_cases": 16,
+      "signed_three_sat_truth_cases": 64,
+      "fresh_variable_check": true,
+      "status": "PASS"
+    },
+    "solver_status_rules": {
+      "status_rule_cases": 15,
+      "timeout_with_witness_is_inconclusive": true,
+      "status": "PASS"
+    },
+    "one_satisfiable_clause": {
+      "status": "INCONCLUSIVE",
+      "logical_variables_with_padding": 12,
+      "dimension": 30,
+      "points": 52,
+      "hamming_four_connected": true,
+      "source_satisfiable": true,
+      "sat_assignments_checked": 1536,
+      "source_witness": [
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "witness_signs": [
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1
+      ],
+      "original_unlabeled_milp": {
+        "status": 1,
+        "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is None)",
+        "checked_integer_witness": false,
+        "verdict": "INCONCLUSIVE"
+      }
+    },
+    "two_contradictory_clauses": {
+      "status": "INCONCLUSIVE",
+      "logical_variables_with_padding": 12,
+      "dimension": 30,
+      "points": 54,
+      "hamming_four_connected": true,
+      "source_satisfiable": false,
+      "sat_assignments_checked": 0,
+      "original_unlabeled_milp": {
+        "status": 1,
+        "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is None)",
+        "checked_integer_witness": false,
+        "verdict": "INCONCLUSIVE"
+      }
+    },
+    "three_satisfiable_signed_clauses": {
+      "status": "INCONCLUSIVE",
+      "logical_variables_with_padding": 12,
+      "dimension": 30,
+      "points": 60,
+      "hamming_four_connected": true,
+      "source_satisfiable": true,
+      "sat_assignments_checked": 384,
+      "source_witness": [
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "witness_signs": [
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        1,
+        -1,
+        1,
+        -1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1,
+        -1,
+        1
+      ],
+      "original_unlabeled_milp": {
+        "status": 1,
+        "message": "Time limit reached. (HiGHS Status 13: model_status is Time limit reached; primal_status is None)",
+        "checked_integer_witness": false,
+        "verdict": "INCONCLUSIVE"
+      }
+    }
+  }
+}

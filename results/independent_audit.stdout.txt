@@ -1,0 +1,55 @@
+{
+  "status": "PASS",
+  "scope": "Independent finite checks; universal claims need the proof audit.",
+  "thresholds": {
+    "exact_cases": 150,
+    "largest_minimal_length": 63245
+  },
+  "counting": {
+    "all_denominator_4_distributions_n3": 210,
+    "exact_distribution_epsilon_cases": 867
+  },
+  "rational_reference": {
+    "rational_reference_runs": 30,
+    "observations_crosschecked": 663
+  },
+  "zero_and_empty_groups": [
+    {
+      "n": 1,
+      "zero_label": 1,
+      "updates": 0
+    },
+    {
+      "n": 1,
+      "zero_label": -1,
+      "updates": 1
+    },
+    {
+      "n": 2,
+      "zero_label": 1,
+      "updates": 0
+    },
+    {
+      "n": 2,
+      "zero_label": -1,
+      "updates": 1
+    },
+    {
+      "n": 5,
+      "zero_label": 1,
+      "updates": 0
+    },
+    {
+      "n": 5,
+      "zero_label": -1,
+      "updates": 1
+    }
+  ],
+  "numeric_input_regression": {
+    "dimension": 1000,
+    "accepted_binary_float_values_normalized": true,
+    "common_denominator_bits": 1438
+  }
+}
+Exact adaptive phase trees: 8
+Largest phase-state count: 13

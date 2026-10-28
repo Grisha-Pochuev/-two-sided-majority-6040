@@ -1,0 +1,10 @@
+{
+  "status": "all finite checks passed",
+  "margin_implication": {
+    "all_sign_vector_point_pairs": 87380,
+    "compatible_pairs": 28348
+  },
+  "target_distributions": 126,
+  "large_branch_cases": 4,
+  "result_file": "proper_verification_results.json"
+}

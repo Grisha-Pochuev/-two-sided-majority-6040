@@ -1,0 +1,9 @@
+{
+  "status": "PASS",
+  "exact_edge_probability_checks": 180,
+  "exact_finite_distribution_counting_checks": 15,
+  "iid_learner_trials": 64,
+  "trials_with_error_above_epsilon": 0,
+  "exact_stopping_checks": 27,
+  "result_file": "/tmp/majority6040-checks-dj97x62k/code/active_verification_results.json"
+}

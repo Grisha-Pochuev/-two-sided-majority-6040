@@ -1,0 +1,238 @@
+{
+  "source_sha256": {
+    "majority_6040_note.tex": "0bea634ed7458dea19b613d2868a09e3b2ae0eddd5543ff41f3e46524a353f4b",
+    "proper_signed_majority.py": "e0ca76db51336603b3d7efc47ef65e650b19ff8936e0ac090863db906a4eb2c8",
+    "check_proper.py": "03f01da3c2835002a7f3613b9647a70daf16401d86cfbbd363fc6391e16d151a",
+    "compatibility_hardness.md": "b2351ae2ee9d4fbb76eb2c6dabb09d8200425945db0c1b3b9335ef26c784e6aa",
+    "verify_reduction.py": "62f1032e73f61f294c9e905b7d026db26c67d91fd469fd07e87a76ba5d89affa"
+  },
+  "existing_proper_checks": {
+    "margin_implication": {
+      "all_sign_vector_point_pairs": 87380,
+      "compatible_pairs": 28348
+    },
+    "enumeration": {
+      "fully_checked_target_distributions": 126,
+      "total_support_observations": 1872
+    },
+    "rounding_arithmetic": {
+      "rounded_coefficient_values": 33,
+      "five_bit_inputs_each": 32,
+      "exact_example_epsilon": "1/10",
+      "exact_example_delta": "1/100",
+      "q": 8,
+      "r": 17,
+      "m": 131072
+    },
+    "large_branch": [
+      {
+        "n": 2560,
+        "m": 16,
+        "positive_group_size": 1,
+        "corrections": 31,
+        "rounding_trials": 1,
+        "smallest_signed_training_score": 350
+      },
+      {
+        "n": 2560,
+        "m": 16,
+        "positive_group_size": 640,
+        "corrections": 29,
+        "rounding_trials": 1,
+        "smallest_signed_training_score": 302
+      },
+      {
+        "n": 2560,
+        "m": 16,
+        "positive_group_size": 1280,
+        "corrections": 30,
+        "rounding_trials": 1,
+        "smallest_signed_training_score": 348
+      },
+      {
+        "n": 2560,
+        "m": 16,
+        "positive_group_size": 2559,
+        "corrections": 32,
+        "rounding_trials": 1,
+        "smallest_signed_training_score": 322
+      }
+    ],
+    "randomness_order": {
+      "random_calls": 2,
+      "random_bits": 10,
+      "observations": 16384
+    },
+    "compatibility_distinction": {
+      "n": 10,
+      "x": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "target_signs": [
+        1,
+        1,
+        1,
+        -1,
+        -1,
+        1,
+        1,
+        -1,
+        -1,
+        -1
+      ],
+      "candidate_signs": [
+        1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1,
+        -1
+      ],
+      "candidate_centered_score": 2,
+      "candidate_group_compatibility": false
+    }
+  },
+  "nae_local_equivalence_truth_table_cases": 24,
+  "independent_parameter_edge_cases": 20,
+  "constructor_unchecked_out_of_range_literal": {
+    "clauses": [
+      [
+        13,
+        14,
+        15,
+        16
+      ],
+      [
+        -13,
+        14,
+        15,
+        16
+      ]
+    ],
+    "default_variables": 12,
+    "constructed_variables": 12,
+    "input_formula_is_unsatisfiable": true,
+    "constructed_dataset_has_explicit_positive_witness": true,
+    "witness": [
+      1,
+      1,
+      1,
+      -1,
+      -1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1,
+      1,
+      -1
+    ],
+    "note": "The helper must reject indices outside 1..variables, or infer variables from the clauses."
+  },
+  "fresh_reduction_checks_with_required_status": {
+    "satisfiable": {
+      "dimension": 30,
+      "points": 52,
+      "source_witnesses_checked": 1536,
+      "expected_solver_status": 0,
+      "observed_solver": {
+        "status": 0,
+        "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+        "checked_integer_witness": true,
+        "positive_group_size": 15
+      }
+    },
+    "contradictory": {
+      "dimension": 30,
+      "points": 54,
+      "source_witnesses_checked": 0,
+      "expected_solver_status": 2,
+      "observed_solver": {
+        "status": 2,
+        "message": "The problem is infeasible. (HiGHS Status 8: model_status is Infeasible; primal_status is None)"
+      }
+    },
+    "signed_satisfiable": {
+      "dimension": 30,
+      "points": 60,
+      "source_witnesses_checked": 384,
+      "expected_solver_status": 0,
+      "observed_solver": {
+        "status": 0,
+        "message": "Optimization terminated successfully. (HiGHS Status 7: Optimal)",
+        "checked_integer_witness": true,
+        "positive_group_size": 15
+      }
+    }
+  },
+  "post_repair_2026_10_21": {
+    "remarks": {
+      "R1": "CLOSED",
+      "R2": "CLOSED",
+      "R3": "CLOSED",
+      "R4": "CLOSED"
+    },
+    "final_file_sha256": {
+      "verify_reduction.py": "9b65f64a3379dfd6a2fb3a7d432e5745fe998fd71e6f38246b91b97fea58e30f",
+      "proper_signed_majority.py": "7ad7b46922fbbb7d4734bce381962803fd5a23bf78146b7c40fc49e915dbbfc7"
+    },
+    "verification_runs": {
+      "stdlib": {
+        "report_file": "audit_reduction_stdlib_20261021.json",
+        "status": "PASS",
+        "observed_exit_code": 0,
+        "expected_result": "PASS"
+      },
+      "solver": {
+        "report_file": "audit_reduction_solver_20261021.json",
+        "status": "PASS",
+        "observed_exit_code": 0,
+        "expected_result": "PASS"
+      },
+      "timeout": {
+        "report_file": "audit_reduction_timeout_20261021.json",
+        "status": "INCONCLUSIVE",
+        "observed_exit_code": 2,
+        "expected_result": "INCONCLUSIVE"
+      },
+      "missing_solver": {
+        "report_file": "audit_reduction_missing_solver_20261021.json",
+        "status": "INCONCLUSIVE",
+        "observed_exit_code": 2,
+        "expected_result": "INCONCLUSIVE"
+      }
+    },
+    "notice": "Original snapshot hashes and findings above are preserved; repaired-file hashes and reruns are recorded here."
+  }
+}

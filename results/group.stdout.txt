@@ -1,0 +1,12 @@
+{
+  "status": "PASS",
+  "exhaustive_margin": {
+    "max_n": 10,
+    "partition_example_pairs_checked": 1398100,
+    "admissible_labeled_pairs_checked": 406868,
+    "minimum_normalized_signed_margin": "1/5",
+    "includes_empty_groups": true
+  },
+  "iid_learner_trials": 96,
+  "result_file": "verification_results.json"
+}

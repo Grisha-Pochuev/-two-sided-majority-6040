@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+reproduced_results/
+.venv/
+*.aux
+*.out
+*.toc

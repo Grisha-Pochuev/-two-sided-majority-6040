@@ -1,0 +1,11 @@
+{
+  "status": "PASS",
+  "minimal_exact_threshold_checks": 3803,
+  "input_boundary_checks": {
+    "normalized_integral_coefficients": true,
+    "nonintegral_rounding_coefficients_rejected": true,
+    "zero_active_vector_rejected": true,
+    "group_example_length": 60,
+    "active_example_length": 60
+  }
+}

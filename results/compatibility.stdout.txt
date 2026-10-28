@@ -1,0 +1,1 @@
+{"status": "PASS", "solver_requested": true, "checks": {"input_validation": "PASS", "local_gadgets": "PASS", "solver_status_rules": "PASS", "one_satisfiable_clause": "PASS", "two_contradictory_clauses": "PASS", "three_satisfiable_signed_clauses": "PASS"}, "results_file": "/tmp/majority6040-checks-dj97x62k/code/compatibility_verification_results.json"}

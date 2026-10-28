@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it using the metadata below."
+type: software
+title: "Two-sided 60/40 majority: prediction, counting, and compatibility"
+authors:
+  - family-names: "Pochuev"
+    given-names: "Grisha"
+    affiliation: "Independent Researcher"
+    orcid: "https://orcid.org/0009-0005-0078-0857"
+    email: "n_854@mail.ru"
+version: "1.0"
+date-released: 2026-10-28
+doi: 10.5281/zenodo.23717313
+url: "https://doi.org/10.5281/zenodo.23717313"
+repository-code: "https://github.com/Grisha-Pochuev/-two-sided-majority-6040"
+license:
+  - MIT
+  - CC-BY-4.0
+abstract: >
+  Self-contained prediction guarantees for two interpretations of the
+  two-sided majority with a 60/40 gap from Blum and Balcan (COLT 2007):
+  a dimension-independent perceptron bound for the group-normalized promise,
+  a distribution-free counting inequality for the active-normalized promise,
+  a polynomial-time signed-literal learner, and NP-completeness of exact
+  partition compatibility. Includes LaTeX source, Python code, reproducible
+  finite checks, and internal AI-assisted audit reports.
+keywords:
+  - semi-supervised learning
+  - PAC learning
+  - majority with margins
+  - perceptron
+  - sample compression
+  - NP-completeness
+  - open problem
+  - COLT 2007
+preferred-citation:
+  type: article
+  title: "Two-sided 60/40 majority: prediction, counting, and compatibility"
+  authors:
+    - family-names: "Pochuev"
+      given-names: "Grisha"
+      orcid: "https://orcid.org/0009-0005-0078-0857"
+  year: 2026
+  month: 10
+  publisher:
+    name: "Zenodo"
+  doi: 10.5281/zenodo.23717313
+  url: "https://doi.org/10.5281/zenodo.23717313"
+  notes: "Preprint, version 1.0"
